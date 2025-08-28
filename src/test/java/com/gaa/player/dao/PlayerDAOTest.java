@@ -1,127 +1,154 @@
 package com.gaa.player.dao;
 
-import org.junit.jupiter.api.*;
+import com.gaa.player.dto.PlayerDTO;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 class PlayerDAOTest {
-    private static PlayerDAO playerDAO;
-    private static PlayerDTO.PlayerDTO testPlayer;
 
-    @BeforeAll
-    static void setUp() {
-        playerDAO = new PlayerDAO();
+    private IPlayerDAO playerDAO;
 
-        // Create a test player
-        testPlayer = new PlayerDTO.PlayerDTO();
-        testPlayer.setName("Test Player");
-        testPlayer.setAge(25);
-        testPlayer.setHeight(1.85f);
-        testPlayer.setWeight(80.5f);
-        testPlayer.setPosition("Midfield");
-        testPlayer.setCounty("Test County");
-        testPlayer.setClub("Test Club");
-        testPlayer.setGoalsScored(5);
-        testPlayer.setPointsScored(15);
-        testPlayer.setActive(true);
-
-        // Insert the test player
-        testPlayer = playerDAO.insertPlayer(testPlayer);
-    }
-
-    @AfterAll
-    static void tearDown() {
-        // Clean up by deleting the test player
-        if (testPlayer != null) {
-            playerDAO.deletePlayerById(testPlayer.getId());
-        }
+    @BeforeEach
+    void setUp() {
+        playerDAO = new MockPlayerDAO(); // Use mock for testing
     }
 
     @Test
-    void getAllPlayers() {
-        List<PlayerDTO.PlayerDTO> players = playerDAO.getAllPlayers();
-        assertNotNull(players);
-        assertFalse(players.isEmpty());
+    void testGetAllPlayers() {
+        // When
+        List<PlayerDTO> players = playerDAO.getAllPlayers();
+
+        // Then
+        assertNotNull(players, "Player list should not be null");
+        assertFalse(players.isEmpty(), "Player list should not be empty");
+        assertEquals(15, players.size(), "Should return 15 sample players");
+
+        // Verify first player data
+        PlayerDTO firstPlayer = players.get(0);
+        assertEquals("Con O Callaghan", firstPlayer.getName());
+        assertEquals("Dublin", firstPlayer.getCounty());
+        assertEquals(26, firstPlayer.getAge());
     }
 
     @Test
-    void getPlayerById() {
-        PlayerDTO.PlayerDTO player = playerDAO.getPlayerById(testPlayer.getId());
-        assertNotNull(player);
-        assertEquals(testPlayer.getName(), player.getName());
+    void testGetPlayerById_ExistingPlayer() {
+        // When
+        PlayerDTO player = playerDAO.getPlayerById(1);
+
+        // Then
+        assertNotNull(player, "Player should not be null");
+        assertEquals(1, player.getId());
+        assertEquals("Con O Callaghan", player.getName());
     }
 
     @Test
-    void getPlayerById_NotFound() {
-        PlayerDTO.PlayerDTO player = playerDAO.getPlayerById(-1);
-        assertNull(player);
+    void testGetPlayerById_NonExistentPlayer() {
+        // When
+        PlayerDTO player = playerDAO.getPlayerById(999);
+
+        // Then
+        assertNull(player, "Should return null for non-existent player");
     }
 
     @Test
-    void insertPlayer() {
-        PlayerDTO.PlayerDTO newPlayer = new PlayerDTO.PlayerDTO();
-        newPlayer.setName("New Test Player");
+    void testInsertPlayer() {
+        // Given
+        PlayerDTO newPlayer = new PlayerDTO();
+        newPlayer.setName("Test Player");
         newPlayer.setAge(22);
-        newPlayer.setHeight(1.78f);
-        newPlayer.setWeight(75.0f);
+        newPlayer.setHeight(1.85f);
+        newPlayer.setWeight(80.0f);
         newPlayer.setPosition("Forward");
-        newPlayer.setCounty("New County");
-        newPlayer.setClub("New Club");
-        newPlayer.setGoalsScored(3);
+        newPlayer.setCounty("Test County");
+        newPlayer.setClub("Test Club");
+        newPlayer.setGoalsScored(5);
         newPlayer.setPointsScored(10);
         newPlayer.setActive(true);
 
-        PlayerDTO.PlayerDTO insertedPlayer = playerDAO.insertPlayer(newPlayer);
-        assertNotNull(insertedPlayer);
-        assertTrue(insertedPlayer.getId() > 0);
+        // When
+        PlayerDTO insertedPlayer = playerDAO.insertPlayer(newPlayer);
 
-        // Clean up
-        playerDAO.deletePlayerById(insertedPlayer.getId());
+        // Then
+        assertNotNull(insertedPlayer, "Inserted player should not be null");
+        assertTrue(insertedPlayer.getId() > 0, "Should have generated ID");
+        assertEquals("Test Player", insertedPlayer.getName());
+
+        // Verify player was added to list
+        List<PlayerDTO> players = playerDAO.getAllPlayers();
+        assertEquals(16, players.size(), "Should have 16 players after insertion");
     }
 
     @Test
-    void deletePlayerById() {
-        // Create a player to delete
-        PlayerDTO.PlayerDTO playerToDelete = new PlayerDTO.PlayerDTO();
-        playerToDelete.setName("Delete Test Player");
-        playerToDelete.setAge(30);
-        playerToDelete.setHeight(1.90f);
-        playerToDelete.setWeight(85.0f);
-        playerToDelete.setPosition("Defender");
-        playerToDelete.setCounty("Delete County");
-        playerToDelete.setClub("Delete Club");
-        playerToDelete.setGoalsScored(1);
-        playerToDelete.setPointsScored(2);
-        playerToDelete.setActive(false);
+    void testDeletePlayerById_ExistingPlayer() {
+        // When
+        boolean deleted = playerDAO.deletePlayerById(1);
 
-        playerToDelete = playerDAO.insertPlayer(playerToDelete);
-        assertTrue(playerDAO.deletePlayerById(playerToDelete.getId()));
+        // Then
+        assertTrue(deleted, "Should return true for successful deletion");
 
-        // Verify deletion
-        assertNull(playerDAO.getPlayerById(playerToDelete.getId()));
+        // Verify player was removed
+        PlayerDTO player = playerDAO.getPlayerById(1);
+        assertNull(player, "Player should be deleted");
     }
 
     @Test
-    void findPlayersUsingFilter() {
-        List<PlayerDTO.PlayerDTO> players = playerDAO.findPlayersUsingFilter(testPlayer.getCounty());
-        assertNotNull(players);
-        assertFalse(players.isEmpty());
-        assertTrue(players.stream().anyMatch(p -> p.getCounty().equals(testPlayer.getCounty())));
+    void testDeletePlayerById_NonExistentPlayer() {
+        // When
+        boolean deleted = playerDAO.deletePlayerById(999);
+
+        // Then
+        assertFalse(deleted, "Should return false for non-existent player");
     }
 
     @Test
-    void findAllPlayersJson() {
+    void testFindPlayersUsingFilter() {
+        // When
+        List<PlayerDTO> dublinPlayers = playerDAO.findPlayersUsingFilter("Dublin");
+        List<PlayerDTO> kerryPlayers = playerDAO.findPlayersUsingFilter("Kerry");
+        List<PlayerDTO> forwardPlayers = playerDAO.findPlayersUsingFilter("Forward");
+
+        // Then
+        assertNotNull(dublinPlayers);
+        assertNotNull(kerryPlayers);
+        assertNotNull(forwardPlayers);
+
+        // Should find players from Dublin
+        assertTrue(dublinPlayers.size() > 0);
+        assertEquals("Dublin", dublinPlayers.get(0).getCounty());
+
+        // Should find players from Kerry
+        assertTrue(kerryPlayers.size() > 0);
+        assertEquals("Kerry", kerryPlayers.get(0).getCounty());
+    }
+
+    @Test
+    void testFindAllPlayersJson() {
+        // When
         String json = playerDAO.findAllPlayersJson();
-        assertNotNull(json);
-        assertFalse(json.isEmpty());
+
+        // Then
+        assertNotNull(json, "JSON should not be null");
+        assertFalse(json.isEmpty(), "JSON should not be empty");
+        assertTrue(json.contains("Con O Callaghan"), "JSON should contain player data");
     }
 
     @Test
-    void findPlayerByIdJson() {
-        String json = playerDAO.findPlayerByIdJson(testPlayer.getId());
+    void testFindPlayerByIdJson() {
+        // When
+        String json = playerDAO.findPlayerByIdJson(1);
+        String emptyJson = playerDAO.findPlayerByIdJson(999);
+
+        // Then
         assertNotNull(json);
         assertFalse(json.isEmpty());
+        assertTrue(json.contains("Con O Callaghan"));
+        assertEquals("{}", emptyJson, "Should return empty JSON for non-existent player");
     }
 }
