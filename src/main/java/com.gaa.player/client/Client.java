@@ -228,6 +228,7 @@ public class Client {
         try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+            //                                                              ^ Added missing parenthesis
 
             JSONObject request = new JSONObject();
             request.put("command", "deletePlayer");

@@ -1,16 +1,17 @@
 package com.gaa.player.dao;
 
 import com.gaa.player.dto.PlayerDTO;
+import com.gaa.player.util.DBConnection;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 public class PlayerDAO implements IPlayerDAO {
-    private Connection connection;
     private Set<Integer> playerIdCache;
 
     public PlayerDAO() {
@@ -30,19 +31,7 @@ public class PlayerDAO implements IPlayerDAO {
     }
 
     private Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                connection = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/D00265095",
-                        "root", // replace with your username
-                        "password" // replace with your password
-                );
-            } catch (ClassNotFoundException e) {
-                throw new SQLException("MySQL JDBC Driver not found", e);
-            }
-        }
-        return connection;
+        return DBConnection.getInstance().getConnection();
     }
 
     @Override
@@ -77,7 +66,6 @@ public class PlayerDAO implements IPlayerDAO {
 
     @Override
     public PlayerDTO getPlayerById(int id) {
-        // First check cache
         if (!playerIdCache.contains(id)) {
             return null;
         }

@@ -2,9 +2,13 @@ package com.gaa.player.server;
 
 import com.gaa.player.dao.IPlayerDAO;
 import com.gaa.player.dao.PlayerDAO;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -73,7 +77,7 @@ public class Server {
 
                     case "insertPlayer":
                         JSONObject playerData = requestJson.getJSONObject("player");
-                        PlayerDTO playerDTO = new PlayerDTO();
+                        com.gaa.player.dto.PlayerDTO playerDTO = new com.gaa.player.dto.PlayerDTO();
                         playerDTO.setName(playerData.getString("name"));
                         playerDTO.setAge(playerData.getInt("age"));
                         playerDTO.setHeight((float) playerData.getDouble("height"));
@@ -85,7 +89,7 @@ public class Server {
                         playerDTO.setPointsScored(playerData.getInt("pointsScored"));
                         playerDTO.setActive(playerData.getBoolean("isActive"));
 
-                        PlayerDTO insertedPlayer = playerDAO.insertPlayer(playerDTO);
+                        com.gaa.player.dto.PlayerDTO insertedPlayer = playerDAO.insertPlayer(playerDTO);
                         if (insertedPlayer != null) {
                             responseJson.put("status", "success");
                             responseJson.put("data", new JSONObject(playerDAO.findPlayerByIdJson(insertedPlayer.getId())));
@@ -104,9 +108,9 @@ public class Server {
 
                     case "filterPlayers":
                         String filter = requestJson.getString("filter");
-                        List<PlayerDTO> filteredPlayers = playerDAO.findPlayersUsingFilter(filter);
+                        java.util.List<com.gaa.player.dto.PlayerDTO> filteredPlayers = playerDAO.findPlayersUsingFilter(filter);
                         JSONArray filteredArray = new JSONArray();
-                        for (PlayerDTO p : filteredPlayers) {
+                        for (com.gaa.player.dto.PlayerDTO p : filteredPlayers) {
                             filteredArray.put(new JSONObject(playerDAO.findPlayerByIdJson(p.getId())));
                         }
                         responseJson.put("status", "success");

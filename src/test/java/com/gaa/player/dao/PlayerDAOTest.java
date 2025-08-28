@@ -1,6 +1,5 @@
 package com.gaa.player.dao;
 
-import com.gaa.player.dto.PlayerDTO;
 import org.junit.jupiter.api.*;
 
 import java.util.List;
@@ -9,14 +8,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerDAOTest {
     private static PlayerDAO playerDAO;
-    private static PlayerDTO testPlayer;
+    private static PlayerDTO.PlayerDTO testPlayer;
 
     @BeforeAll
     static void setUp() {
         playerDAO = new PlayerDAO();
 
         // Create a test player
-        testPlayer = new PlayerDTO();
+        testPlayer = new PlayerDTO.PlayerDTO();
         testPlayer.setName("Test Player");
         testPlayer.setAge(25);
         testPlayer.setHeight(1.85f);
@@ -42,27 +41,27 @@ class PlayerDAOTest {
 
     @Test
     void getAllPlayers() {
-        List<PlayerDTO> players = playerDAO.getAllPlayers();
+        List<PlayerDTO.PlayerDTO> players = playerDAO.getAllPlayers();
         assertNotNull(players);
         assertFalse(players.isEmpty());
     }
 
     @Test
     void getPlayerById() {
-        PlayerDTO player = playerDAO.getPlayerById(testPlayer.getId());
+        PlayerDTO.PlayerDTO player = playerDAO.getPlayerById(testPlayer.getId());
         assertNotNull(player);
         assertEquals(testPlayer.getName(), player.getName());
     }
 
     @Test
     void getPlayerById_NotFound() {
-        PlayerDTO player = playerDAO.getPlayerById(-1);
+        PlayerDTO.PlayerDTO player = playerDAO.getPlayerById(-1);
         assertNull(player);
     }
 
     @Test
     void insertPlayer() {
-        PlayerDTO newPlayer = new PlayerDTO();
+        PlayerDTO.PlayerDTO newPlayer = new PlayerDTO.PlayerDTO();
         newPlayer.setName("New Test Player");
         newPlayer.setAge(22);
         newPlayer.setHeight(1.78f);
@@ -74,7 +73,7 @@ class PlayerDAOTest {
         newPlayer.setPointsScored(10);
         newPlayer.setActive(true);
 
-        PlayerDTO insertedPlayer = playerDAO.insertPlayer(newPlayer);
+        PlayerDTO.PlayerDTO insertedPlayer = playerDAO.insertPlayer(newPlayer);
         assertNotNull(insertedPlayer);
         assertTrue(insertedPlayer.getId() > 0);
 
@@ -85,7 +84,7 @@ class PlayerDAOTest {
     @Test
     void deletePlayerById() {
         // Create a player to delete
-        PlayerDTO playerToDelete = new PlayerDTO();
+        PlayerDTO.PlayerDTO playerToDelete = new PlayerDTO.PlayerDTO();
         playerToDelete.setName("Delete Test Player");
         playerToDelete.setAge(30);
         playerToDelete.setHeight(1.90f);
@@ -106,7 +105,7 @@ class PlayerDAOTest {
 
     @Test
     void findPlayersUsingFilter() {
-        List<PlayerDTO> players = playerDAO.findPlayersUsingFilter(testPlayer.getCounty());
+        List<PlayerDTO.PlayerDTO> players = playerDAO.findPlayersUsingFilter(testPlayer.getCounty());
         assertNotNull(players);
         assertFalse(players.isEmpty());
         assertTrue(players.stream().anyMatch(p -> p.getCounty().equals(testPlayer.getCounty())));
