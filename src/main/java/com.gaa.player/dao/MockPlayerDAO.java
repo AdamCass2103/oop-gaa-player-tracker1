@@ -13,7 +13,7 @@ public class MockPlayerDAO implements IPlayerDAO {
     public MockPlayerDAO() {
         this.mockPlayers = new ArrayList<>();
         createSampleData();
-        System.out.println("✅ Mock DAO initialized with " + mockPlayers.size() + " sample players");
+        System.out.println(" Mock DAO initialized with " + mockPlayers.size() + " sample players");
     }
 
     private void createSampleData() {
@@ -70,9 +70,9 @@ public class MockPlayerDAO implements IPlayerDAO {
     public boolean deletePlayerById(int id) {
         boolean removed = mockPlayers.removeIf(p -> p.getId() == id);
         if (removed) {
-            System.out.println("✅ Mock: Player with ID " + id + " deleted");
+            System.out.println(" Mock: Player with ID " + id + " deleted");
         } else {
-            System.out.println("❌ Mock: Player with ID " + id + " not found");
+            System.out.println(" Mock: Player with ID " + id + " not found");
         }
         return removed;
     }
@@ -87,7 +87,7 @@ public class MockPlayerDAO implements IPlayerDAO {
 
         player.setId(newId);
         mockPlayers.add(player);
-        System.out.println("✅ Mock: New player added with ID " + newId + " - " + player.getName());
+        System.out.println(" Mock: New player added with ID " + newId + " - " + player.getName());
         return player;
     }
 
@@ -105,7 +105,7 @@ public class MockPlayerDAO implements IPlayerDAO {
             }
         }
 
-        System.out.println("✅ Mock: Filter '" + filter + "' found " + results.size() + " players");
+        System.out.println(" Mock: Filter '" + filter + "' found " + results.size() + " players");
         return results;
     }
 
@@ -127,7 +127,7 @@ public class MockPlayerDAO implements IPlayerDAO {
             System.out.println(" Mock: Found player JSON for ID " + id);
             return convertToJson(player).toString();
         } else {
-            System.out.println("❌ Mock: No player found for ID " + id);
+            System.out.println(" Mock: No player found for ID " + id);
             return "{}";
         }
     }

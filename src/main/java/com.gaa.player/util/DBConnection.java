@@ -15,28 +15,28 @@ public class DBConnection {
 
     private DBConnection() {
         try {
-            System.out.println("🔍 Attempting to load MySQL JDBC Driver...");
+            System.out.println(" Attempting to load MySQL JDBC Driver...");
             Class.forName("com.mysql.cj.jdbc.Driver");
-            System.out.println("✅ MySQL JDBC Driver loaded successfully!");
+            System.out.println("MySQL JDBC Driver loaded successfully!");
 
-            System.out.println("🔍 Attempting to connect to Dkit MySQL server...");
-            System.out.println("🔍 URL: " + URL);
-            System.out.println("🔍 Username: " + USERNAME);
-            System.out.println("🔍 Password: " + (PASSWORD.isEmpty() ? "[empty]" : "[set]"));
+            System.out.println(" Attempting to connect to Dkit MySQL server...");
+            System.out.println(" URL: " + URL);
+            System.out.println(" Username: " + USERNAME);
+            System.out.println(" Password: " + (PASSWORD.isEmpty() ? "[empty]" : "[set]"));
 
             // Add connection timeout to prevent hanging
             String urlWithTimeout = URL + "?connectTimeout=5000&socketTimeout=5000";
             this.connection = DriverManager.getConnection(urlWithTimeout, USERNAME, PASSWORD);
 
-            System.out.println("✅ Connected to Dkit MySQL database successfully!");
-            System.out.println("🔍 Database: " + connection.getCatalog());
+            System.out.println(" Connected to Dkit MySQL database successfully!");
+            System.out.println(" Database: " + connection.getCatalog());
 
         } catch (ClassNotFoundException e) {
-            System.err.println("❌ MySQL JDBC Driver not found!");
+            System.err.println(" MySQL JDBC Driver not found!");
             e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("❌ Dkit database connection failed: " + e.getMessage());
-            System.err.println("💡 Try these solutions:");
+            System.err.println(" Dkit database connection failed: " + e.getMessage());
+            System.err.println(" Try these solutions:");
             System.err.println("   1. Are you on campus network or using Dkit VPN?");
             System.err.println("   2. Try different passwords (empty, your student ID, your Dkit password)");
             System.err.println("   3. Contact Dkit IT: it@dkit.ie");
@@ -57,7 +57,7 @@ public class DBConnection {
     public Connection getConnection() {
         try {
             if (connection == null || connection.isClosed()) {
-                System.out.println("⚠️ Connection was closed, reconnecting...");
+                System.out.println(" Connection was closed, reconnecting...");
                 instance = new DBConnection();
             }
         } catch (SQLException e) {
